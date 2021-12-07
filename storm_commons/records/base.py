@@ -56,20 +56,29 @@ class BaseSQLAlchemyModelAPI:
             obj = cls(model=cls.model_cls(**kwargs))
 
             # saving
-            db.session.add(obj)
+            db.session.add(obj.model)
 
-            if commit:
-                db.session.commit()
+        if commit:
+            db.session.commit()
         return obj
 
     @classmethod
-    def get_record(cls, id_):
-        """Get record by id."""
+    def get_record(cls, **kwargs):
+        """Get record by arbitrary attribute(s)."""
         with db.session.no_autoflush:
-            query = cls.model_cls.query.filter_by(id=id_)
+            query = cls.model_cls.query.filter_by(**kwargs)
 
             obj = query.one()
             return cls(model=obj)
+
+    @classmethod
+    def get_records(cls, **kwargs):
+        """Get record by arbitrary attribute(s)."""
+        with db.session.no_autoflush:
+            query = cls.model_cls.query.filter_by(**kwargs)
+
+            objs = query.all()
+            return [cls(model=obj) for obj in objs]
 
 
 __all__ = ("BaseSQLAlchemyModel", "BaseSQLAlchemyModelAPI")
