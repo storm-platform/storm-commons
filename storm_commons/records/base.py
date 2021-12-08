@@ -48,6 +48,21 @@ class BaseSQLAlchemyModelAPI:
     def __init__(self, model=None):
         self.model = model
 
+    @property
+    def id(self):
+        """Get model identifier."""
+        return self.model.id if self.model else None
+
+    @property
+    def created(self):
+        """Get creation timestamp."""
+        return self.model.created if self.model else None
+
+    @property
+    def updated(self):
+        """Get last updated timestamp."""
+        return self.model.updated if self.model else None
+
     @classmethod
     def create(cls, commit=False, **kwargs):
         """Create a new docker image entry."""
