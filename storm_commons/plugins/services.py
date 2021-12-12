@@ -8,14 +8,14 @@
 import pkg_resources
 
 
-def load_service_plugins(entry_point_group: str):
+def load_service_plugins(entry_point_group: str, load_callable: bool = False):
     """Initialize entry point plugins."""
 
     plugins_definition = []
     for entry_point in pkg_resources.iter_entry_points(group=entry_point_group):
 
         entry_point_obj = entry_point.load()
-        if callable(entry_point_obj):
+        if load_callable and callable(entry_point_obj):
             entry_point_obj = entry_point_obj()
 
         plugins_definition.append(entry_point_obj)
