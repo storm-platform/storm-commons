@@ -25,4 +25,17 @@ class UserComponent(ServiceComponent):
         record.user_id = identity.id
 
 
-__all__ = ("ProjectComponent", "PipelineComponent", "UserComponent")
+class RecordServiceTypeComponent(ServiceComponent):
+    """Service component which set the service context in the record."""
+
+    def create(self, identity, data=None, record=None, service=None, **kwargs):
+        """Create handler."""
+        record.service = service or data.get("service")
+
+
+__all__ = (
+    "RecordServiceTypeComponent",
+    "ProjectComponent",
+    "PipelineComponent",
+    "UserComponent",
+)

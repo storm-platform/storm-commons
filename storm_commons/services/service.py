@@ -5,6 +5,8 @@
 # storm-commons is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
 
+from invenio_db import db
+
 from invenio_records_resources.services.base import Service
 from invenio_records_resources.services import ServiceSchemaWrapper
 
@@ -101,6 +103,10 @@ class PluginService(SimpleServiceBase):
         super(PluginService, self).__init__(config)
 
         self._plugin_manager = plugin_manager
+
+    def list_plugin_services(self):
+        """List the available service plugin metadata."""
+        return self.plugin_manager.services()
 
 
 __all__ = ("SimpleServiceBase", "PluginService")
