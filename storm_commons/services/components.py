@@ -10,20 +10,10 @@ import re
 from marshmallow import ValidationError
 from invenio_pidstore.errors import PIDAlreadyExists
 
-from storm_project.proxies import current_project
-
 from invenio_access.permissions import system_process
 from invenio_records_resources.services.records.components import ServiceComponent
 
 from invenio_records.dictutils import dict_set
-
-
-class ProjectComponent(ServiceComponent):
-    """Service component which set the project context in the record."""
-
-    def create(self, identity, data=None, record=None, **kwargs):
-        """Create handler."""
-        record.project_id = current_project._obj.model.id
 
 
 class UserComponent(ServiceComponent):
@@ -147,7 +137,6 @@ __all__ = (
     "CustomPIDGeneratorComponent",
     "RecordServiceTypeComponent",
     "UserComponent",
-    "ProjectComponent",
     "RecordMetadataComponent",
     "VersionedRecordAccessDefinitionComponent",
     "RecordAccessDefinitionComponent",
