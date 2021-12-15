@@ -10,10 +10,7 @@ import re
 from marshmallow import ValidationError
 from invenio_pidstore.errors import PIDAlreadyExists
 
-from invenio_access.permissions import system_process
 from invenio_records_resources.services.records.components import ServiceComponent
-
-from invenio_records.dictutils import dict_set
 
 
 class UserComponent(ServiceComponent):
