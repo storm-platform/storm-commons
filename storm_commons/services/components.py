@@ -77,58 +77,78 @@ class CustomPIDGeneratorComponent(ServiceComponent):
         setattr(record, "pid", provider.pid)
 
 
-class BaseAccessComponent(ServiceComponent):
-    """Base component to define record access.
+class VersionedRecordAccessDefinitionComponent(ServiceComponent):
+    """Access component to versioned records with parent."""
 
-    See:
-        This code is adapted from: https://github.com/inveniosoftware/invenio-communities/blob/837f33f1c0013a69fcec0ef188200a99fafddc47/invenio_communities/communities/services/components.py#L126
-    """
-
-    def _populate_access(self, identity, data, record, **kwargs):
-        if record is not None and "access" in data:
-            record.setdefault("access", {})
-            record["access"].update(data.get("access", {}))
-
-    def _init_access_entities(self, identity, record, access_field, **kwargs):
-        """Initialize the access fields."""
-        is_system_process = system_process in identity.provides
-
-        initial_entities = [{"user": identity.id}] if not is_system_process else []
-        dict_set(record, access_field, initial_entities)
+    def _create(self, identity, data=None, record=None, **kwargs):
+        """Extra ``create`` method operation."""
+        pass
 
     def create(self, identity, data=None, record=None, **kwargs):
         """Add basic ownership fields to the record."""
 
-        self._populate_access(identity, data, record, **kwargs)
+        parent = record.parent
+        if parent:
+            parent.access.contributors.append({"user": identity.id})
 
-        self._init_access_entities(identity, record, "access.owned_by", **kwargs)
-        self._init_access_entities(identity, record, "access.contributed_by", **kwargs)
+            # extra method: this method was added to users provides
+            # arbitrary functions for the ``create`` operation.
+            self._create(identity, data, record, **kwargs)
 
-    def update(self, identity, data=None, record=None, **kwargs):
-        """Update handler."""
-        self._populate_access(identity, data, record, **kwargs)
+
+class RecordAccessDefinitionComponent(ServiceComponent):
+    """Access component to versioned records without parent."""
+
+    def create(self, identity, data=None, record=None, **kwargs):
+        """Add basic ownership fields to the record."""
+        if record:
+            _user_obj = {"user": identity.id}
+
+            record.access.owners.append(_user_obj)
+            record.access.contributors.append(_user_obj)
+
+
+class RecordMetadataComponent(ServiceComponent):
+    """Service component for metadata.
+
+    Note:
+        (class-vendoring) Imported class from Invenio RDM Records to reduce dependencies in the system.
+        (https://github.com/inveniosoftware/invenio-rdm-records/blob/d7e7c7a2a44986de88e2d7941722bc72fd7dc345/invenio_rdm_records/services/components/metadata.py#L18)
+    """
+
+    new_version_skip_fields = []
+
+    def create(self, identity, data=None, record=None, **kwargs):
+        """Inject parsed metadata to the record."""
+        record.metadata = data.get("metadata", {})
 
     def update_draft(self, identity, data=None, record=None, **kwargs):
-        """Update handler."""
-        self._populate_access(identity, data, record, **kwargs)
+        """Inject parsed metadata to the record."""
+        record.metadata = data.get("metadata", {})
 
     def publish(self, identity, draft=None, record=None, **kwargs):
         """Update draft metadata."""
-        record.access = draft.access
+        record.metadata = draft.get("metadata", {})
 
     def edit(self, identity, draft=None, record=None, **kwargs):
         """Update draft metadata."""
-        draft.access = record.access
+        draft.metadata = record.get("metadata", {})
 
     def new_version(self, identity, draft=None, record=None, **kwargs):
         """Update draft metadata."""
-        draft.access = record.access
+        draft.metadata = copy(record.get("metadata", {}))
+        # Remove fields that should not be copied to the new version
+        # (publication date and version)
+        for f in self.new_version_skip_fields:
+            draft.metadata.pop(f, None)
 
 
 __all__ = (
-    "BaseAccessComponent",
     "CustomPIDGeneratorComponent",
     "RecordServiceTypeComponent",
-    "ProjectComponent",
     "UserComponent",
+    "ProjectComponent",
+    "RecordMetadataComponent",
+    "VersionedRecordAccessDefinitionComponent",
+    "RecordAccessDefinitionComponent",
 )

@@ -10,10 +10,7 @@ from invenio_records_permissions.generators import AuthenticatedUser, SystemProc
 
 
 class BaseRecordPermissionPolicy(BasePermissionPolicy):
-    """Access control configuration for deposit operations.
-    See:
-        This policy is based on `RDMRecordPermissionPolicy` descriptions (https://github.com/inveniosoftware/invenio-rdm-records/blob/6a2574556392223331048f60d6fe9d190269477c/invenio_rdm_records/services/permissions.py).
-    """
+    """Access control configuration for deposit operations."""
 
     #
     # High level permissions
