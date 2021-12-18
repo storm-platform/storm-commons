@@ -11,7 +11,12 @@ from invenio_records_resources.services.records.components import ServiceCompone
 
 
 class RecordAccessDefinitionComponent(ServiceComponent):
-    """Access component to versioned records without parent."""
+    """Access component to versioned records without parent.
+
+    In the current implementation of this Component, it is assumed that
+    the records have a systemfield ``access`` of type
+    ``storm_commons.records.systemfields.fields.access.RecordAccessField``.
+    """
 
     def create(self, identity, data=None, record=None, **kwargs):
         """Add basic ownership fields to the record."""
@@ -28,6 +33,47 @@ class RecordAccessDefinitionComponent(ServiceComponent):
             # contributors section.
             record.access.owners.append(_prj_obj)
             record.access.contributors.append(_user_obj)
+
+    def update(
+        self,
+        identity,
+        data=None,
+        record=None,
+        agent_type=None,
+        agent_id=None,
+        operation=None,
+        **kwargs
+    ):
+        """update access handler."""
+        if all([record, agent_type, agent_id, operation]):
+
+            # store where the agent will
+            # be added/removed.
+            type_mapper = {
+                "contributor": "contributors",
+                "owner": "owners",
+            }
+            type_key = type_mapper.get(agent_type)
+
+            if type_key:
+
+                agent_store = getattr(record.access, type_key)
+                if operation == "add":
+                    # getting the type of user and assign it
+                    # to access object.
+                    agent_store.append({"user": agent_id})
+
+                elif operation == "remove":
+                    # finding the index: here we use
+                    # the ``agent_id`` as a basis to avoid
+                    # ``agent`` classes definition.
+                    agent_obj = list(
+                        filter(lambda x: x.agent_id == agent_id, agent_store)
+                    )
+
+                    if agent_obj:
+                        agent_obj = agent_obj[0]
+                        agent_store.remove(agent_obj)
 
 
 class VersionedRecordAccessDefinitionComponent(ServiceComponent):
