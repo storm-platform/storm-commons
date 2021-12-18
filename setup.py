@@ -48,6 +48,7 @@ extras_require["all"] = [req for _, reqs in extras_require.items() for req in re
 setup_requires = []
 
 install_requires = [
+    "pydash>=5.1.0,<6.0",
     "jinja2>=3.0.3,<4.0.0",
     "invenio-drafts-resources>=0.14.0,<0.15.0",
     "invenio-records-resources>=0.17.0,<0.18",
