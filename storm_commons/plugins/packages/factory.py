@@ -5,14 +5,16 @@
 # storm-commons is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
 
-from .services import load_service_plugins
+from .entry_point import load_plugins_entrypoint
 
 
 def plugin_factory(app, entrypoint_group_name):
     """Flask factory app to initialize the flask extensions plugins."""
 
     available_services = {}
-    available_plugins = load_service_plugins(entrypoint_group_name, load_callable=False)
+    available_plugins = load_plugins_entrypoint(
+        entrypoint_group_name, load_callable=False
+    )
 
     for available_plugin_cls in available_plugins:
         # factoring the plugin flask extension

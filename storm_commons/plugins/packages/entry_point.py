@@ -8,8 +8,8 @@
 import pkg_resources
 
 
-def load_service_plugins(entry_point_group: str, load_callable: bool = False):
-    """Initialize entry point plugins."""
+def load_plugins_entrypoint(entry_point_group: str, load_callable: bool = False):
+    """Initialize plugins entry point."""
 
     plugins_definition = []
     for entry_point in pkg_resources.iter_entry_points(group=entry_point_group):
@@ -20,6 +20,3 @@ def load_service_plugins(entry_point_group: str, load_callable: bool = False):
 
         plugins_definition.append(entry_point_obj)
     return plugins_definition
-
-
-__all__ = "load_service_plugins"
