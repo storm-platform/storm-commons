@@ -25,7 +25,7 @@ class AdminRecordService(RecordService):
         super(AdminRecordService, self).__init__(config)
 
     def _edit_record_access(
-        self, identity, record_id, user_type, user_id, operation, uow
+        self, identity, record_id, agent_type, agent_id, operation, uow
     ):
         """Edit project access."""
         # loading the record
@@ -39,8 +39,8 @@ class AdminRecordService(RecordService):
             identity,
             data=record,
             record=record,
-            agent_id=user_id,
-            agent_type=user_type,
+            agent_id=agent_id,
+            agent_type=agent_type,
             operation=operation,
             uow=uow,
         )
@@ -49,7 +49,7 @@ class AdminRecordService(RecordService):
         return self.result_item(self, identity, record, links_tpl=self.links_item_tpl)
 
     @unit_of_work()
-    def admin_add_agent(self, identity, record_id, user_type, user_id, uow=None):
+    def admin_add_agent(self, identity, record_id, agent_type, agent_id, uow=None):
         """Add a new agent to an existing record.
 
         Args:
@@ -57,19 +57,19 @@ class AdminRecordService(RecordService):
 
             record_id (str): Record id
 
-            user_type (str): Type of user that will be added.
+            agent_type (str): Type of user that will be added.
 
-            user_id (str): User id
+            agent_id (str): Agent id
 
         Returns:
             Dict: The updated record document.
         """
         return self._edit_record_access(
-            identity, record_id, user_type, user_id, "add", uow
+            identity, record_id, agent_type, agent_id, "add", uow
         )
 
     @unit_of_work()
-    def admin_remove_agent(self, identity, record_id, user_type, user_id, uow=None):
+    def admin_remove_agent(self, identity, record_id, agent_type, agent_id, uow=None):
         """Remove an existing agent from an existing record.
 
         Args:
@@ -77,15 +77,15 @@ class AdminRecordService(RecordService):
 
             record_id (str): Record id
 
-            user_type (str): Type of user that will be added.
+            agent_type (str): Type of user that will be added.
 
-            user_id (str): User id
+            agent_id (str): Agent id
 
         Returns:
             Dict: The updated record document.
         """
         return self._edit_record_access(
-            identity, record_id, user_type, user_id, "remove", uow
+            identity, record_id, agent_type, agent_id, "remove", uow
         )
 
     def admin_list_agents(self, identity, record_id):
