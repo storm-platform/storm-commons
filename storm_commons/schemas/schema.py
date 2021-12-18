@@ -8,7 +8,7 @@
 from marshmallow import fields, Schema
 
 
-class Agent(Schema):
+class AgentSchema(Schema):
     """An agent schema.
 
     Note:
@@ -16,5 +16,7 @@ class Agent(Schema):
     """
 
     user = fields.Integer(required=False)
-
     project = fields.Integer(required=False)
+
+
+__all__ = "AgentSchema"

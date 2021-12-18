@@ -19,3 +19,6 @@ def marshmallow_not_blank_field(**kwargs):
         min=1,
         **kwargs,
     )
+
+
+__all__ = "marshmallow_not_blank_field"

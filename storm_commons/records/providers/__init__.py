@@ -5,6 +5,6 @@
 # storm-commons is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
 
-from .access import RecordAccessField
+from .pid import PIDRegisteredProvider
 
-__all__ = "RecordAccessField"
+__all__ = "PIDRegisteredProvider"

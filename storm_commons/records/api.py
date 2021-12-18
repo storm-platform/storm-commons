@@ -5,44 +5,14 @@
 # storm-commons is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
 
-import uuid
-from datetime import datetime
-
 from invenio_db import db
-from sqlalchemy.dialects import mysql
-from sqlalchemy_utils.types import UUIDType
+from storm_commons.records.model import BaseRecordModel
 
 
-class BaseSQLAlchemyModel:
-
-    #
-    # Cache basic information
-    #
-    id = db.Column(
-        UUIDType,
-        primary_key=True,
-        default=uuid.uuid4,
-    )
-
-    # Timestamp (SQLAlchemy-Utils timestamp model does not have support for fractional seconds).
-    created = db.Column(
-        db.DateTime().with_variant(mysql.DATETIME(fsp=6), "mysql"),
-        default=datetime.utcnow,
-        nullable=False,
-    )
-
-    # Timestamp (SQLAlchemy-Utils timestamp model does not have support for fractional seconds).
-    updated = db.Column(
-        db.DateTime().with_variant(mysql.DATETIME(fsp=6), "mysql"),
-        default=datetime.utcnow,
-        nullable=False,
-    )
-
-
-class BaseSQLAlchemyModelAPI:
+class BaseRecordModelAPI:
     """Base class to access and manipulate SQLAlchemy models."""
 
-    model_cls = BaseSQLAlchemyModel
+    model_cls = BaseRecordModel
     """SQLAlchemy model class defining which table stores the records."""
 
     def __init__(self, model=None):
@@ -78,22 +48,26 @@ class BaseSQLAlchemyModelAPI:
         return obj
 
     @classmethod
-    def get_record(cls, **kwargs):
+    def get_record(cls, with_deleted=False, **kwargs):
         """Get record by arbitrary attribute(s)."""
         with db.session.no_autoflush:
             query = cls.model_cls.query.filter_by(**kwargs)
+            if not with_deleted:
+                query = query.filter(cls.model_cls.is_deleted != True)
 
             obj = query.one()
             return cls(model=obj)
 
     @classmethod
-    def get_records(cls, **kwargs):
+    def get_records(cls, with_deleted=False, **kwargs):
         """Get record by arbitrary attribute(s)."""
         with db.session.no_autoflush:
             query = cls.model_cls.query.filter_by(**kwargs)
+            if not with_deleted:
+                query = query.filter(cls.model_cls.is_deleted != True)
 
             objs = query.all()
             return [cls(model=obj) for obj in objs]
 
 
-__all__ = ("BaseSQLAlchemyModel", "BaseSQLAlchemyModelAPI")
+__all__ = "BaseRecordModelAPI"

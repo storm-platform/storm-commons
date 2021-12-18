@@ -5,13 +5,12 @@
 # storm-commons is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
 
-
 from invenio_pidstore.models import PIDStatus
 from invenio_pidstore.providers.base import BaseProvider
 from invenio_pidstore.errors import PIDDoesNotExistError, PIDAlreadyExists
 
 
-class RegisteredIdProvider(BaseProvider):
+class PIDRegisteredProvider(BaseProvider):
 
     pid_type = "baseid"
     """Type of persistent identifier."""
@@ -39,9 +38,11 @@ class RegisteredIdProvider(BaseProvider):
         """
         kwargs["pid_value"] = record["id"]
         kwargs["status"] = cls.default_status
+
         kwargs["object_type"] = cls.object_type
         kwargs["object_uuid"] = record.model.id
-        return super(RegisteredIdProvider, cls).create(**kwargs)
+
+        return super(PIDRegisteredProvider, cls).create(**kwargs)
 
     @classmethod
     def update(cls, pid, new_value):
@@ -62,4 +63,4 @@ class RegisteredIdProvider(BaseProvider):
         return cls(pid)
 
 
-__all__ = "RegisteredIdProvider"
+__all__ = "PIDRegisteredProvider"
