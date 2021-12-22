@@ -8,6 +8,7 @@
 from invenio_db import db
 
 from invenio_records_resources.services.base import Service
+from invenio_records_resources.services.uow import unit_of_work, RecordCommitOp
 from invenio_records_resources.services import ServiceSchemaWrapper, LinksTemplate
 
 
@@ -33,7 +34,8 @@ class BaseInvenioService(Service):
     def links_item_tpl(self):
         return LinksTemplate(self.config.links_item)
 
-    def create(self, identity, data):
+    @unit_of_work()
+    def create(self, identity, data, uow=None):
         """Create record object in the datastore.
 
         Args:
@@ -60,7 +62,7 @@ class BaseInvenioService(Service):
                 component.create(identity, record=record, data=data)
 
         # Saving the data
-        db.session.commit()
+        uow.register(RecordCommitOp(record))
 
         return self.result_item(
             self,
@@ -98,7 +100,8 @@ class BaseInvenioService(Service):
             schema=self.schema,
         )
 
-    def update(self, identity, id_, data):
+    @unit_of_work()
+    def update(self, identity, id_, data, uow=None):
         """Update an existing record in the datastore.
 
         Args:
@@ -126,7 +129,7 @@ class BaseInvenioService(Service):
                 component.update(identity, record=record, data=data)
 
         # Saving the data
-        db.session.commit()
+        uow.register(RecordCommitOp(record))
 
         return self.result_item(
             self,
@@ -136,7 +139,8 @@ class BaseInvenioService(Service):
             schema=self.schema,
         )
 
-    def delete(self, identity, id_):
+    @unit_of_work()
+    def delete(self, identity, id_, uow=None):
         """Update an existing record in the datastore.
 
         Args:
@@ -157,7 +161,7 @@ class BaseInvenioService(Service):
                 component.delete(identity, record=record)
 
         # Saving the data
-        db.session.commit()
+        uow.register(RecordCommitOp(record))
 
     def search(self, identity, params):
         """Search an existing record in the datastore.

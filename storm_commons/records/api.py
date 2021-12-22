@@ -6,6 +6,8 @@
 # under the terms of the MIT License; see LICENSE file for more details.
 
 from invenio_db import db
+from invenio_records.errors import MissingModelError
+
 from storm_commons.records.model import BaseRecordModel
 
 
@@ -40,7 +42,6 @@ class BaseRecordModelAPI:
         with db.session.begin_nested():
             obj = cls(model=cls.model_cls(**kwargs))
 
-            # saving
             db.session.add(obj.model)
 
         if commit:
@@ -68,6 +69,16 @@ class BaseRecordModelAPI:
 
             objs = query.all()
             return [cls(model=obj) for obj in objs]
+
+    def commit(self, **kwargs):
+        """Commit the record model changes in the database."""
+        if self.model is None:
+            raise MissingModelError()
+
+        with db.session.begin_nested():
+            db.session.merge(self.model)
+
+        return self
 
 
 __all__ = "BaseRecordModelAPI"
