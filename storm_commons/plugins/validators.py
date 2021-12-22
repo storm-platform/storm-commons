@@ -58,8 +58,11 @@ def marshmallow_validate_custom_plugin_schema(extension_name, service_name, **kw
         service = plugin_manager.service(service_name)
 
         # validating
-        return service.schema().load
-    return lambda x: True
+        if service.schema:
+            return service.schema().load
+    return (
+        lambda *args, **kwargs: False
+    )  # customization not allowed in the selected service.
 
 
 __all__ = (
